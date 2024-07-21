@@ -1,0 +1,52 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+root = true
+
+# All files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = true
+
+# Match specific files for indentation
+[*.md]
+indent_size = 4
+trim_trailing_whitespace = false
+
+[*.json]
+indent_size = 2
+
+[*.yml]
+indent_size = 2
+
+# JavaScript files
+[*.js]
+indent_size = 2
+
+# TypeScript files
+[*.ts]
+indent_size = 2
+
+# HTML files
+[*.html]
+indent_size = 2
+
+# CSS files
+[*.css]
+indent_size = 2
+
+# JSON files
+[*.json]
+indent_size = 2
+
+# YAML files
+[*.yaml]
+indent_size = 2
+
+# YAML files
+[*.yml]
+indent_size = 2
+
