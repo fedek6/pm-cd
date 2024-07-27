@@ -15,6 +15,7 @@ const {
   TOKEN,
   PROJECT,
   NODE_ENV,
+  GIT_TOKEN,
 } = process.env;
 
 const fastify = Fastify({ logger: NODE_ENV === "development" });
@@ -37,6 +38,10 @@ lcd ${UPLOADS_LOCAL_DIR}
 cd ${UPLOADS_REMOTE_DIR}
 mirror --reverse --verbose --delete --continue --parallel=2 --no-perms
 bye
+`;
+
+const gitCommand = `
+git clone https://${GIT_TOKEN}@github.com/fedek6/pm-cd.git
 `;
 
 interface PostData {
@@ -74,6 +79,9 @@ fastify.post("/webhook", async (request, reply) => {
 
   const worker = async () => {
     console.time("worker");
+    const git = await runCommand(`git fetch && git pull`, LOCAL_DIR);
+    console.log("Finished git", git);
+
     const a = await runCommand("yarn build", LOCAL_DIR);
     console.log("Finished build", a);
 

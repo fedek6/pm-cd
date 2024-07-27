@@ -10,5 +10,6 @@ declare namespace NodeJS {
     UPLOADS_REMOTE_DIR: string;
     TOKEN: string;
     PROJECT: string;
+    GIT_TOKEN: string;
   }
 }
