@@ -8,5 +8,7 @@ declare namespace NodeJS {
     PORT: string;
     UPLOADS_LOCAL_DIR: string;
     UPLOADS_REMOTE_DIR: string;
+    TOKEN: string;
+    PROJECT: string;
   }
 }

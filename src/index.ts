@@ -1,5 +1,6 @@
 import Fastify from "fastify";
 import { runCommand } from "./lib";
+import cors from "@fastify/cors";
 import "dotenv/config";
 
 const {
@@ -11,9 +12,13 @@ const {
   PORT,
   UPLOADS_LOCAL_DIR,
   UPLOADS_REMOTE_DIR,
+  TOKEN,
+  PROJECT,
+  NODE_ENV,
 } = process.env;
 
-const fastify = Fastify({ logger: true });
+const fastify = Fastify({ logger: NODE_ENV === "development" });
+
 
 const lftpCommand1 = `
 set ftp:ssl-allow no
@@ -47,18 +52,20 @@ function assertIsPostData(postData: any): asserts postData is PostData {
   }
 }
 
-fastify.post("/", async (request, reply) => {
+fastify.post("/webhook", async (request, reply) => {
   const { authorization } = request.headers;
   const bearer = authorization?.replace("Bearer ", "");
 
-  if (!bearer || bearer !== "aaaa") {
-    return reply.status(401).send({ error: "No or invalid Authorization header" });
+  if (!bearer || bearer !== TOKEN) {
+    return reply
+      .status(401)
+      .send({ error: "No or invalid Authorization header" });
   }
 
   try {
     const postData = request.body;
     assertIsPostData(postData);
-    if (postData.project !== "msn") {
+    if (postData.project !== PROJECT) {
       return { error: "Invalid project" };
     }
   } catch (err) {
@@ -81,22 +88,17 @@ fastify.post("/", async (request, reply) => {
   return { status: "dispatched" };
 });
 
-fastify.get("/webhook", async (request, _) => {
-  const authHeader = request.headers.authorization;
-
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    const token = authHeader.substring(7, authHeader.length);
-    fastify.log.info(`Bearer token: ${token}`);
-    return { token };
-  } else {
-    return { error: "No or invalid Authorization header" };
-  }
+fastify.get("/", async () => {
+  return { status: "ok" };
 });
 
 const start = async () => {
   try {
+    await fastify.register(cors, {
+      origin: "*",
+    });
     await fastify.listen({ port: +PORT });
-    console.log("Server is running on http://localhost:3000");
+    console.log(`Server is running on http://localhost:${PORT}`);
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);
