@@ -30,7 +30,7 @@ set net:reconnect-interval-base 5
 set ftp:passive-mode yes
 open ${FTP_HOST}
 user ${FTP_USER} ${FTP_PASS}
-lcd ${LOCAL_DIR}
+lcd ${LOCAL_DIR}/out
 cd ${REMOTE_DIR}
 mirror --reverse --verbose --delete --continue --parallel=2 --no-perms --exclude .htaccess --exclude uploads
 
