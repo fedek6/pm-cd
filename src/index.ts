@@ -1,5 +1,5 @@
 import Fastify from "fastify";
-import { runCommand } from "./lib";
+import { runCommand, generateId } from "./lib";
 import cors from "@fastify/cors";
 import "dotenv/config";
 
@@ -19,7 +19,6 @@ const {
 } = process.env;
 
 const fastify = Fastify({ logger: NODE_ENV === "development" });
-
 
 const lftpCommand1 = `
 set ftp:ssl-allow no
@@ -47,6 +46,8 @@ git clone https://${GIT_TOKEN}@github.com/fedek6/pm-cd.git
 interface PostData {
   project: string;
 }
+
+const runningWorkers = new Set<string>();
 
 function assertIsPostData(postData: any): asserts postData is PostData {
   if (typeof postData !== "object" || postData === null) {
@@ -79,18 +80,28 @@ fastify.post("/webhook", async (request, reply) => {
 
   const worker = async () => {
     console.time("worker");
-    const git = await runCommand(`git fetch && git pull`, LOCAL_DIR);
-    console.log("Finished git", git);
+    try {
+      const git = await runCommand(`git fetch && git pull`, LOCAL_DIR);
+      console.log("Finished git", git);
 
-    const a = await runCommand("yarn build", LOCAL_DIR);
-    console.log("Finished build", a);
+      const a = await runCommand("yarn build", LOCAL_DIR);
+      console.log("Finished build", a);
 
-    const b = await runCommand(`lftp -f <(echo "${lftpCommand1}")`);
-    console.log("Finished upload", b);
+      const b = await runCommand(`lftp -f <(echo "${lftpCommand1}")`);
+      console.log("Finished upload", b);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      runningWorkers.delete(PROJECT);
+    }
 
     console.timeEnd("worker");
   };
 
+  if (runningWorkers.has(PROJECT)) {
+    return { status: "running" };
+  }
+  runningWorkers.add(PROJECT);
   worker();
 
   return { status: "dispatched" };
