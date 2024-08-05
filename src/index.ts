@@ -62,11 +62,18 @@ fastify.post("/webhook", async (request, reply) => {
   const { authorization } = request.headers;
   const bearer = authorization?.replace("Bearer ", "");
 
-  if (!bearer || bearer !== TOKEN) {
+  if (!bearer) {
     return reply
       .status(401)
-      .send({ error: "No or invalid Authorization header" });
+      .send({ error: "Missing token" });
   }
+
+  if (bearer !== TOKEN) {
+    return reply
+      .status(401)
+      .send({ error: "Invalid token" });
+  }
+
 
   try {
     const postData = request.body;
