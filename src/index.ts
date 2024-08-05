@@ -1,5 +1,5 @@
 import Fastify from "fastify";
-import { runCommand, generateId } from "./lib";
+import { runCommandSpawn} from "./lib";
 import cors from "@fastify/cors";
 import "dotenv/config";
 
@@ -88,13 +88,13 @@ fastify.post("/webhook", async (request, reply) => {
   const worker = async () => {
     console.time("worker");
     try {
-      const git = await runCommand(`git fetch && git pull`, LOCAL_DIR);
+      const git = await runCommandSpawn(`git fetch && git pull`, LOCAL_DIR);
       console.log("Finished git", git);
 
-      const a = await runCommand("yarn build", LOCAL_DIR);
+      const a = await runCommandSpawn("yarn build", LOCAL_DIR);
       console.log("Finished build", a);
 
-      const b = await runCommand(`lftp -f <(echo "${lftpCommand1}")`);
+      const b = await runCommandSpawn(`lftp -f <(echo "${lftpCommand1}")`);
       console.log("Finished upload", b);
     } catch (err) {
       console.error(err);

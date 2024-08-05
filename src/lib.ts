@@ -1,6 +1,6 @@
-import { exec } from "child_process";
+import { exec, spawn } from "child_process";
 
-export const runCommand = (command: string, cwd?: string): Promise<string> => {
+export const runCommandExec = (command: string, cwd?: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     const options = {
       cwd,
@@ -16,6 +16,45 @@ export const runCommand = (command: string, cwd?: string): Promise<string> => {
         reject(`stderr: ${stderr}`);
       }
       resolve(stdout);
+    });
+  });
+};
+
+export const runCommandSpawn = (command: string, cwd?: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const [cmd, ...args] = command.split(' '); // Split the command into cmd and args
+    const options = {
+      cwd,
+      shell: false, // Do not use a shell with spawn
+    };
+
+    const childProcess = spawn(cmd, args, options);
+
+    let stdout = '';
+    let stderr = '';
+
+    // Collect data from stdout
+    childProcess.stdout.on('data', (data) => {
+      stdout += data.toString();
+    });
+
+    // Collect data from stderr
+    childProcess.stderr.on('data', (data) => {
+      stderr += data.toString();
+    });
+
+    // Handle process close
+    childProcess.on('close', (code) => {
+      if (code !== 0) {
+        reject(`stderr: ${stderr}`);
+      } else {
+        resolve(stdout);
+      }
+    });
+
+    // Handle errors
+    childProcess.on('error', (error) => {
+      reject(`error: ${error.message}`);
     });
   });
 };
