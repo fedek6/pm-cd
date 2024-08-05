@@ -69,6 +69,7 @@ fastify.post("/webhook", async (request, reply) => {
   }
 
   if (bearer !== TOKEN) {
+    console.log(`${bearer} !== ${TOKEN}`);
     return reply
       .status(401)
       .send({ error: "Invalid token" });
