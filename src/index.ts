@@ -87,15 +87,17 @@ fastify.post("/webhook", async (request, reply) => {
 
   const worker = async () => {
     console.time("worker");
+
     try {
       const git = await runCommandExec(`/usr/bin/git fetch && /usr/bin/git pull`, LOCAL_DIR);
-      console.log("Finished git", git);
+      console.log("Finished git");
 
       const a = await runCommandExec("yarn build", LOCAL_DIR);
-      console.log("Finished build", a);
+      console.log("Finished build");
 
       const b = await runCommandExec(`/usr/bin/lftp -f <(echo "${lftpCommand1}")`);
-      console.log("Finished upload", b);
+      console.log("Finished upload");
+
     } catch (err) {
       console.error(err);
     } finally {
