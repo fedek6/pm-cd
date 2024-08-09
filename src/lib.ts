@@ -5,7 +5,7 @@ export const runCommandExec = (command: string, cwd?: string): Promise<string> =
     const options = {
       cwd,
       buffer: "utf-8",
-      shell: "/usr/bin/bash",
+      stdio: "ignore",
     };
 
     exec(command, options, (error, stdout, stderr) => {

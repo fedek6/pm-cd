@@ -58,6 +58,12 @@ function assertIsPostData(postData: any): asserts postData is PostData {
   }
 }
 
+fastify.get("/health", async () => {
+  const health = await runCommandExec(`echo "Working OK"`, LOCAL_DIR);
+  return { health: health.trim() };
+});
+
+
 fastify.post("/webhook", async (request, reply) => {
   const { authorization } = request.headers;
   const bearer = authorization?.replace("Bearer ", "");
