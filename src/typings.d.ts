@@ -11,5 +11,6 @@ declare namespace NodeJS {
     TOKEN: string;
     PROJECT: string;
     GIT_TOKEN: string;
+    YARN_PATH: string;
   }
 }

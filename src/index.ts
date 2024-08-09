@@ -16,6 +16,7 @@ const {
   PROJECT,
   NODE_ENV,
   GIT_TOKEN,
+  YARN_PATH,
 } = process.env;
 
 const fastify = Fastify({ logger: NODE_ENV === "development" });
@@ -98,7 +99,7 @@ fastify.post("/webhook", async (request, reply) => {
       const git = await runCommandExec(`/usr/bin/git fetch && /usr/bin/git pull`, LOCAL_DIR);
       console.log("Finished git");
 
-      const a = await runCommandExec("/home/fedek6/.nvm/versions/node/v20.16.0/bin/yarn build", LOCAL_DIR);
+      const a = await runCommandExec(`${YARN_PATH} build`, LOCAL_DIR);
       console.log("Finished build");
 
       const b = await runCommandExec(`/usr/bin/lftp -f <(echo "${lftpCommand1}")`);
